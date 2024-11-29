@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\SshKeyController;
 
@@ -15,4 +16,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
          ->except(['show']);
 
     Route::apiResource('servers', ServerController::class);
+
+    Route::apiResource('projects', ProjectController::class);
 });

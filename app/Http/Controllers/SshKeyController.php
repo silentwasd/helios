@@ -17,7 +17,7 @@ class SshKeyController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'        => 'required|string|max:255|unique:ssh_keys,name',
+            'name'        => 'required|string|max:255',
             'private_key' => 'required|string'
         ]);
 
@@ -30,7 +30,7 @@ class SshKeyController extends Controller
     public function update(Request $request, SshKey $sshKey)
     {
         $data = $request->validate([
-            'name'        => ['required', 'string', 'max:255', Rule::unique('ssh_keys')->ignore($sshKey->id)],
+            'name'        => ['required', 'string', 'max:255'],
             'private_key' => 'required|string'
         ]);
 
