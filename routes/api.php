@@ -20,5 +20,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('projects', ProjectController::class);
 
-    Route::apiResource('projects.applications', Project\ApplicationController::class);
+    Route::apiResource('projects.applications', Project\ApplicationController::class)->scoped();
 });
