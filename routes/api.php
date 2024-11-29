@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\SshKeyController;
+use App\Http\Controllers\Project;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 
@@ -18,4 +19,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('servers', ServerController::class);
 
     Route::apiResource('projects', ProjectController::class);
+
+    Route::apiResource('projects.applications', Project\ApplicationController::class);
 });
