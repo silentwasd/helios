@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\UserScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Ssh\Ssh;
 
+#[ScopedBy(UserScope::class)]
 class Server extends Model
 {
     protected $fillable = [
@@ -13,7 +16,8 @@ class Server extends Model
         'host',
         'port',
         'username',
-        'ssh_key_id'
+        'ssh_key_id',
+        'user_id'
     ];
 
     public function check(): bool|string

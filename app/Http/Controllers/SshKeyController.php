@@ -21,7 +21,10 @@ class SshKeyController extends Controller
             'private_key' => 'required|string'
         ]);
 
-        SshKey::create($data);
+        SshKey::create([
+            ...$data,
+            'user_id' => auth()->id()
+        ]);
     }
 
     public function update(Request $request, SshKey $sshKey)

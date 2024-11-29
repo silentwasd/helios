@@ -23,7 +23,10 @@ class ServerController extends Controller
             'ssh_key_id' => 'required|exists:ssh_keys,id'
         ]);
 
-        $server = new Server($data);
+        $server = new Server([
+            ...$data,
+            'user_id' => auth()->id()
+        ]);
 
         if (($result = $server->check()) && $result !== true)
             abort(404, "Connection failed:\n" . $result);
