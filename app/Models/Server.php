@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ServerStatus;
 use App\Models\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,10 @@ class Server extends Model
         'username',
         'ssh_key_id',
         'user_id'
+    ];
+
+    protected $casts = [
+        'status' => ServerStatus::class
     ];
 
     public function check(): bool|string

@@ -17,7 +17,8 @@ class ServerResource extends JsonResource
             'host'       => $this->host,
             'port'       => $this->port,
             'username'   => $this->username,
-            'ssh_key_id' => $this->ssh_key_id
+            'ssh_key_id' => $this->ssh_key_id,
+            'status'     => $this->status
         ];
     }
 }
