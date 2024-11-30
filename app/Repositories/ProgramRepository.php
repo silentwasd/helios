@@ -4,12 +4,14 @@ namespace App\Repositories;
 
 use App\Contracts\Program;
 use App\Programs\Nginx;
+use App\Programs\Php;
 use Illuminate\Support\Collection;
 
 class ProgramRepository
 {
     protected array $programs = [
-        Nginx::class
+        Nginx::class,
+        Php::class
     ];
 
     public function all(): Collection

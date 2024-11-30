@@ -39,9 +39,9 @@ class ProgramController extends Controller
         if (!($program = $programRepo->find($data['name'])))
             abort(404, 'Program not found');
 
-        $model = $server->programs()->firstOrCreate(
+        $model = $server->programs()->updateOrCreate(
             ['name' => $program->name()],
-            ['status' => ProgramStatus::Initializing]
+            ['status' => ProgramStatus::Installing]
         );
 
         if (!$server->os()->checkProgram($program))
@@ -61,6 +61,8 @@ class ProgramController extends Controller
     {
         if (!$program->data())
             abort(404, 'Program not found');
+
+        $program->update(['status' => ProgramStatus::Uninstalling]);
 
         if ($server->os()->checkProgram($program->data()))
             UninstallProgramJob::dispatch($program);
