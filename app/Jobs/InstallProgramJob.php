@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Artisan;
 
 class InstallProgramJob implements ShouldQueue
 {
@@ -31,5 +32,7 @@ class InstallProgramJob implements ShouldQueue
             $this->program->update(['status' => ProgramStatus::Installed]);
         else
             $this->program->update(['status' => ProgramStatus::NotInstalled]);
+
+        Artisan::call('update:program-status');
     }
 }

@@ -4,12 +4,12 @@ namespace App\Jobs;
 
 use App\Enums\ProgramStatus;
 use App\Models\Program;
-use App\Repositories\ProgramRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Artisan;
 
 class UninstallProgramJob implements ShouldQueue
 {
@@ -31,5 +31,7 @@ class UninstallProgramJob implements ShouldQueue
             $this->program->update(['status' => ProgramStatus::Uninstalled]);
         else
             $this->program->update(['status' => ProgramStatus::Installed]);
+
+        Artisan::call('update:program-status');
     }
 }
