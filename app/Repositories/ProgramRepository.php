@@ -3,9 +3,12 @@
 namespace App\Repositories;
 
 use App\Contracts\Program;
+use App\Programs\MySql;
 use App\Programs\Nginx;
 use App\Programs\Php;
 use App\Programs\PhpFpm;
+use App\Programs\Redis;
+use App\Programs\Supervisor;
 use Illuminate\Support\Collection;
 
 class ProgramRepository
@@ -13,7 +16,10 @@ class ProgramRepository
     protected array $programs = [
         Nginx::class,
         Php::class,
-        PhpFpm::class
+        PhpFpm::class,
+        MySql::class,
+        Redis::class,
+        Supervisor::class
     ];
 
     public function all(): Collection
