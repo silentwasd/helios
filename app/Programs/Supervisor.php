@@ -21,6 +21,11 @@ class Supervisor implements Program
         return 'Manages and monitors background processes, ensuring reliability and auto-restarts.';
     }
 
+    public function hasService(): string|bool
+    {
+        return true;
+    }
+
     public static function make(): self
     {
         return new Supervisor();

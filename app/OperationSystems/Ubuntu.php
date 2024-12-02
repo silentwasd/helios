@@ -42,4 +42,37 @@ class Ubuntu implements OperationSystem
             "dpkg -l | grep {$program->name()}"
         ])->isSuccessful();
     }
+
+    function startService(string $name): bool
+    {
+        return $this->server->executeSsh([
+            "systemctl start $name"
+        ])->isSuccessful();
+    }
+
+    function stopService(string $name): bool
+    {
+        return $this->server->executeSsh([
+            "systemctl stop $name"
+        ])->isSuccessful();
+    }
+
+    function restartService(string $name): bool
+    {
+        return $this->server->executeSsh([
+            "systemctl restart $name"
+        ])->isSuccessful();
+    }
+
+    function checkServiceStatus(string $name): bool
+    {
+        $process = $this->server->executeSsh([
+            "systemctl is-active --quiet $name && echo 'active' || echo 'inactive'"
+        ]);
+
+        if (!$process->isSuccessful())
+            return $process->isSuccessful();
+
+        return trim($process->getOutput()) == 'active';
+    }
 }

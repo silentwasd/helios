@@ -21,6 +21,11 @@ class Redis implements Program
         return 'In-memory data store used as a database, cache, and message broker.';
     }
 
+    public function hasService(): string|bool
+    {
+        return true;
+    }
+
     public static function make(): self
     {
         return new Redis();

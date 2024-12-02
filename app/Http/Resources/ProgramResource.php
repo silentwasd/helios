@@ -16,7 +16,8 @@ class ProgramResource extends JsonResource
             'name'        => $this->resource['name'],
             'label'       => $this->resource['label'],
             'description' => $this->resource['description'],
-            'status'      => $this->resource['status']
+            'status'      => $this->resource['status'],
+            'has_service' => $this->resource['has_service']
         ];
     }
 }

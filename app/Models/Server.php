@@ -53,7 +53,6 @@ class Server extends Model
         $process = Ssh::create($this->username, $this->host, $this->port)
                       ->usePrivateKey($tempKeyPath)
                       ->disableStrictHostKeyChecking()
-                      ->removeBash()
                       ->execute($commands);
 
         unlink($tempKeyPath);

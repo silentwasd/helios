@@ -9,4 +9,12 @@ interface OperationSystem
     function uninstallProgram(Program $program): bool;
 
     function checkProgram(Program $program): bool;
+
+    function startService(string $name): bool;
+
+    function stopService(string $name): bool;
+
+    function restartService(string $name): bool;
+
+    function checkServiceStatus(string $name): bool;
 }

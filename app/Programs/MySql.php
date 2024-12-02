@@ -21,6 +21,11 @@ class MySql implements Program
         return 'Relational database system for managing and storing structured data.';
     }
 
+    public function hasService(): string|bool
+    {
+        return 'mysql';
+    }
+
     public static function make(): self
     {
         return new MySql();

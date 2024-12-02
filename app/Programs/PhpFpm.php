@@ -21,6 +21,11 @@ class PhpFpm implements Program
         return 'Advanced PHP handler designed for high-performance and scalable web applications.';
     }
 
+    public function hasService(): string|bool
+    {
+        return 'php8.3-fpm';
+    }
+
     public static function make(): self
     {
         return new PhpFpm();

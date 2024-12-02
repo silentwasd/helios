@@ -21,6 +21,11 @@ class Nginx implements Program
         return 'High-performance webserver.';
     }
 
+    public function hasService(): string|bool
+    {
+        return true;
+    }
+
     public static function make(): self
     {
         return new Nginx();

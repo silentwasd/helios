@@ -6,11 +6,15 @@ use App\Enums\ProgramStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProgramResource;
 use App\Jobs\InstallProgramJob;
+use App\Jobs\RestartProgramServiceJob;
+use App\Jobs\StartProgramServiceJob;
+use App\Jobs\StopProgramServiceJob;
 use App\Jobs\UninstallProgramJob;
 use App\Models\Program;
 use App\Models\Server;
 use App\Repositories\ProgramRepository;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProgramController extends Controller
 {
@@ -24,7 +28,8 @@ class ProgramController extends Controller
                     'name'        => $program->name(),
                     'label'       => $program->label(),
                     'description' => $program->description(),
-                    'status'      => $model?->status ?? ProgramStatus::NotInstalled
+                    'status'      => $model?->status ?? ProgramStatus::NotInstalled,
+                    'has_service' => !!$program->hasService()
                 ];
             })
         );
@@ -53,7 +58,33 @@ class ProgramController extends Controller
             ...$model->fresh()->toArray(),
             'name'        => $program->name(),
             'label'       => $program->label(),
-            'description' => $program->description()
+            'description' => $program->description(),
+            'has_service' => !!$program->hasService()
+        ]);
+    }
+
+    public function update(Request $request, Server $server, Program $program)
+    {
+        $data = $request->validate([
+            'action' => ['required', Rule::in(['start', 'stop', 'restart'])]
+        ]);
+
+        if (!$program->data())
+            abort(404, 'Program not found');
+
+        if ($data['action'] == 'start')
+            StartProgramServiceJob::dispatch($program);
+        elseif ($data['action'] == 'stop')
+            StopProgramServiceJob::dispatch($program);
+        elseif ($data['action'] == 'restart')
+            RestartProgramServiceJob::dispatch($program);
+
+        return new ProgramResource([
+            ...$program->fresh()->toArray(),
+            'name'        => $program->data()->name(),
+            'label'       => $program->data()->label(),
+            'description' => $program->data()->description(),
+            'has_service' => !!$program->data()->hasService()
         ]);
     }
 
@@ -73,7 +104,8 @@ class ProgramController extends Controller
             ...$program->fresh()->toArray(),
             'name'        => $program->data()->name(),
             'label'       => $program->data()->label(),
-            'description' => $program->data()->description()
+            'description' => $program->data()->description(),
+            'has_service' => !!$program->data()->hasService()
         ]);
     }
 }

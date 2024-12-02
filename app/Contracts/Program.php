@@ -10,5 +10,7 @@ interface Program
 
     function description(): string;
 
+    function hasService(): string|bool;
+
     static function make(): Program;
 }

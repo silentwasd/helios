@@ -28,6 +28,22 @@ class UpdateProgramStatusCommand extends Command
                     $program->save();
 
                     $this->info(sprintf('Program %s is installed', $program->name));
+
+                    if ($program->data()->hasService()) {
+                        $status = $server->os()->checkServiceStatus(
+                            is_string($program->data()->hasService())
+                                ? $program->data()->hasService()
+                                : $program->data()->name()
+                        );
+
+                        $program->status = $status ? ProgramStatus::Active : ProgramStatus::Stopped;
+                        $program->save();
+
+                        if ($status)
+                            $this->info(sprintf('Program %s is active', $program->name));
+                        else
+                            $this->info(sprintf('Program %s is stopped', $program->name));
+                    }
                 } else {
                     $program->status = ProgramStatus::Uninstalled;
                     $program->save();
