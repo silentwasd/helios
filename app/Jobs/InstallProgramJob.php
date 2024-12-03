@@ -28,11 +28,13 @@ class InstallProgramJob implements ShouldQueue
 
         $this->program->update(['status' => ProgramStatus::Installing]);
 
-        if ($this->program->server->os()->installProgram($program))
+        if ($this->program->server->os()->installProgram($program)) {
             $this->program->update(['status' => ProgramStatus::Installed]);
-        else
-            $this->program->update(['status' => ProgramStatus::NotInstalled]);
 
-        Artisan::call('update:program-status');
+            if ($program->hasService())
+                Artisan::call('update:service-status');
+        } else {
+            $this->program->update(['status' => ProgramStatus::NotInstalled]);
+        }
     }
 }

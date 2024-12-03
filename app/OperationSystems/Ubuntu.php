@@ -27,7 +27,7 @@ class Ubuntu implements OperationSystem
     {
         $process = $this->server->executeSsh([
             "apt purge {$program->name()} -y",
-            "apt purge {$program->name()}-* -y",
+            "apt purge {$program->name()}* -y",
             "apt autoremove --purge -y"
         ]);
 
