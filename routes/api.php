@@ -21,6 +21,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('servers.programs', Server\ProgramController::class);
 
+    Route::apiSingleton('servers.nginx', Server\Nginx\ConfigController::class);
+
     Route::apiResource('projects', ProjectController::class);
 
     Route::apiResource('projects.applications', Project\ApplicationController::class)->scoped();

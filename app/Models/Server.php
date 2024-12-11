@@ -8,7 +8,9 @@ use App\Models\Scopes\UserScope;
 use App\OperationSystems\Ubuntu;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use Spatie\Ssh\Ssh;
 use Symfony\Component\Process\Process;
@@ -34,15 +36,20 @@ class Server extends Model
         return $this->hasMany(Program::class);
     }
 
+    public function sshKey(): BelongsTo
+    {
+        return $this->belongsTo(SshKey::class);
+    }
+
     public function os(): OperationSystem
     {
         return new Ubuntu($this);
     }
 
-    public function executeSsh(array $commands): Process
+    public function usePrivateKey(callable $handle)
     {
         $tempKeyPath = sys_get_temp_dir() . '/ssh_temp_key_' . uniqid();
-        $privateKey = SshKey::findOrFail($this->ssh_key_id)->private_key;
+        $privateKey = $this->sshKey->private_key;
 
         if (!Str::endsWith($privateKey, "\n"))
             $privateKey .= "\n";
@@ -50,14 +57,21 @@ class Server extends Model
         file_put_contents($tempKeyPath, $privateKey);
         chmod($tempKeyPath, 0600);
 
-        $process = Ssh::create($this->username, $this->host, $this->port)
-                      ->usePrivateKey($tempKeyPath)
-                      ->disableStrictHostKeyChecking()
-                      ->execute($commands);
+        $result = $handle($tempKeyPath);
 
         unlink($tempKeyPath);
 
-        return $process;
+        return $result;
+    }
+
+    public function executeSsh(array $commands): Process
+    {
+        return $this->usePrivateKey(function ($privateKey) use ($commands) {
+            return Ssh::create($this->username, $this->host, $this->port)
+                      ->usePrivateKey($privateKey)
+                      ->disableStrictHostKeyChecking()
+                      ->execute($commands);
+        });
     }
 
     public function check(): bool|string
