@@ -7,6 +7,8 @@ use App\Http\Controllers\ServerController;
 use App\Http\Controllers\SshKeyController;
 use App\Http\Controllers\Project;
 use App\Http\Controllers\Server;
+use App\Http\Controllers\Ai;
+use App\Http\Middleware\ServiceMiddleware;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 
@@ -26,4 +28,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('projects', ProjectController::class);
 
     Route::apiResource('projects.applications', Project\ApplicationController::class)->scoped();
+});
+
+Route::middleware([ServiceMiddleware::class])->prefix('ai')->group(function () {
+    Route::post('servers/{server}/execute-command', [Ai\ServerController::class, 'executeCommand']);
 });

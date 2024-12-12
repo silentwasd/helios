@@ -59,7 +59,8 @@ class Server extends Model
 
         $result = $handle($tempKeyPath);
 
-        unlink($tempKeyPath);
+        if (file_exists($tempKeyPath))
+            unlink($tempKeyPath);
 
         return $result;
     }
