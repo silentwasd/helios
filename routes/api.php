@@ -30,6 +30,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('sites', Server\Nginx\SiteController::class);
         Route::patch('sites/{site}/enable', [Server\Nginx\SiteController::class, 'enable']);
         Route::patch('sites/{site}/disable', [Server\Nginx\SiteController::class, 'disable']);
+
+        Route::apiResource('logs', Server\Nginx\LogController::class);
     });
 
     Route::apiResource('projects', ProjectController::class);

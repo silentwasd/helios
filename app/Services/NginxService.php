@@ -6,6 +6,7 @@ use App\Jobs\RestartProgramServiceJob;
 use App\Models\Program;
 use App\Models\Server;
 use Exception;
+use Illuminate\Support\Str;
 
 class NginxService
 {
@@ -146,5 +147,34 @@ class NginxService
         }
 
         return true;
+    }
+
+    public function getLogs(): array
+    {
+        $disk = $this->server->disk();
+
+        return collect($disk->allFiles("var/log/nginx"))
+            ->map(fn(string $file) => [
+                "name"    => Str::chopStart($file, "var/log/nginx/"),
+                "content" => ""
+            ])
+            ->all();
+    }
+
+    public function getLog(string $name): array
+    {
+        $disk = $this->server->disk();
+
+        return [
+            'name'    => $name,
+            'content' => $disk->get("var/log/nginx/$name")
+        ];
+    }
+
+    public function clearLog(string $name): bool
+    {
+        $disk = $this->server->disk();
+
+        return $disk->put("var/log/nginx/$name", "");
     }
 }
