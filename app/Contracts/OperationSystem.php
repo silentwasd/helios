@@ -17,4 +17,6 @@ interface OperationSystem
     function restartService(string $name): bool;
 
     function checkServiceStatus(string $name): bool;
+
+    function makeHardLink(string $source, string $destination): bool;
 }

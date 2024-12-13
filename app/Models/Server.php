@@ -6,11 +6,12 @@ use App\Contracts\OperationSystem;
 use App\Enums\ServerStatus;
 use App\Models\Scopes\UserScope;
 use App\OperationSystems\Ubuntu;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Ssh\Ssh;
 use Symfony\Component\Process\Process;
@@ -44,6 +45,17 @@ class Server extends Model
     public function os(): OperationSystem
     {
         return new Ubuntu($this);
+    }
+
+    public function disk(): Filesystem
+    {
+        return Storage::createSftpDriver([
+            "host"       => $this->host,
+            "port"       => $this->port,
+            "username"   => $this->username,
+            "privateKey" => $this->sshKey->private_key,
+            "root"       => "/"
+        ]);
     }
 
     public function usePrivateKey(callable $handle)

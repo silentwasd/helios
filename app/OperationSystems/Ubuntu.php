@@ -75,4 +75,13 @@ class Ubuntu implements OperationSystem
 
         return trim($process->getOutput()) == 'active';
     }
+
+    public function makeHardLink(string $source, string $destination): bool
+    {
+        $process = $this->server->executeSsh([
+            "ln $source $destination"
+        ]);
+
+        return $process->isSuccessful();
+    }
 }

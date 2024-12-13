@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Jobs\RestartProgramServiceJob;
+use App\Models\Program;
 use App\Models\Server;
 use Exception;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class NginxService
 {
@@ -15,6 +15,13 @@ class NginxService
         protected Server $server
     )
     {
+    }
+
+    public function restart(): void
+    {
+        RestartProgramServiceJob::dispatch(
+            $this->server->programs->first(fn(Program $program) => $program->name == 'nginx')
+        );
     }
 
     /**
@@ -44,13 +51,87 @@ class NginxService
 
     public function getSites(): array
     {
-        return $this->server->usePrivateKey(function ($privateKey) {
-            return Storage::createSftpDriver([
-                'host'       => $this->server->host,
-                'port'       => $this->server->port,
-                'username'   => $this->server->username,
-                'privateKey' => $this->server->sshKey->private_key
-            ])->directories('\etc\nginx');
-        });
+        $disk = $this->server->disk();
+
+        $available = $disk->files("etc/nginx/sites-available");
+        $enabled   = $disk->files("etc/nginx/sites-enabled");
+
+        $sites = collect($available)
+            ->map(fn($path) => basename($path))
+            ->map(
+                fn($site) => [
+                    "name"       => $site,
+                    "content"    => "",
+                    "is_enabled" => collect($enabled)
+                        ->map(fn($path) => basename($path))
+                        ->contains($site)
+                ]
+            );
+
+        return $sites->all();
+    }
+
+    public function isSiteEnabled(string $name): bool
+    {
+        $disk = $this->server->disk();
+
+        return $disk->exists("etc/nginx/sites-enabled/$name");
+    }
+
+    public function hasSite(string $name): bool
+    {
+        $disk = $this->server->disk();
+
+        return $disk->exists("etc/nginx/sites-available/$name");
+    }
+
+    public function createSite(string $name, string $content): bool
+    {
+        $disk = $this->server->disk();
+
+        return $disk->put("etc/nginx/sites-available/$name", $content);
+    }
+
+    public function getSite(string $name): array
+    {
+        $disk = $this->server->disk();
+
+        return [
+            "name"       => $name,
+            "content"    => $disk->get("etc/nginx/sites-available/$name"),
+            "is_enabled" => $this->isSiteEnabled($name)
+        ];
+    }
+
+    public function updateSite(string $name, string $newName, string $content): bool
+    {
+        $disk = $this->server->disk();
+
+        if ($name != $newName)
+            $disk->move("etc/nginx/sites-available/$name", "etc/nginx/sites-available/$newName");
+
+        return $disk->put("etc/nginx/sites-available/$newName", $content);
+    }
+
+    public function enableSite(string $name): bool
+    {
+        return $this->server->os()
+                            ->makeHardLink("/etc/nginx/sites-available/$name", "/etc/nginx/sites-enabled/$name");
+    }
+
+    public function disableSite(string $name): bool
+    {
+        $disk = $this->server->disk();
+
+        return $disk->delete("etc/nginx/sites-enabled/$name");
+    }
+
+    public function deleteSite(string $name): string
+    {
+        $disk = $this->server->disk();
+
+        $disk->delete("etc/nginx/sites-enabled/$name");
+
+        return $disk->delete("etc/nginx/sites-available/$name");
     }
 }
