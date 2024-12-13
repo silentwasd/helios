@@ -55,6 +55,8 @@ class SiteController extends Controller
         if (!$nginx->hasSite($name))
             abort(404, "Site not found.");
 
+        $oldData = $nginx->getSite($name);
+
         $data = $request->validate([
             'new_name' => [
                 'required',
@@ -70,6 +72,15 @@ class SiteController extends Controller
 
         if (!$nginx->updateSite($name, $data['new_name'], $data['content']))
             abort(500, "Failed to update site.");
+
+        $result = $nginx->checkSite();
+
+        if ($result !== true) {
+            $nginx->updateSite($name, $name, $oldData['content']);
+            abort(500, "Nginx check failed:\n$result");
+        }
+
+        $nginx->restart();
     }
 
     public function enable(Server $server, string $name)

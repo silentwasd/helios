@@ -61,7 +61,7 @@ class Server extends Model
     public function usePrivateKey(callable $handle)
     {
         $tempKeyPath = sys_get_temp_dir() . '/ssh_temp_key_' . uniqid();
-        $privateKey = $this->sshKey->private_key;
+        $privateKey  = $this->sshKey->private_key;
 
         if (!Str::endsWith($privateKey, "\n"))
             $privateKey .= "\n";
@@ -83,6 +83,7 @@ class Server extends Model
             return Ssh::create($this->username, $this->host, $this->port)
                       ->usePrivateKey($privateKey)
                       ->disableStrictHostKeyChecking()
+                      ->addExtraOption('-o LogLevel=ERROR')
                       ->execute($commands);
         });
     }

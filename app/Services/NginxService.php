@@ -134,4 +134,17 @@ class NginxService
 
         return $disk->delete("etc/nginx/sites-available/$name");
     }
+
+    public function checkSite(): bool|string
+    {
+        $process = $this->server->executeSsh([
+            'nginx -t'
+        ]);
+
+        if (!$process->isSuccessful()) {
+            return $process->getErrorOutput();
+        }
+
+        return true;
+    }
 }
