@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Project;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\Server;
+use App\Http\Controllers\Server\Certbot\CertController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\SshKeyController;
 use App\Http\Middleware\ServiceMiddleware;
@@ -31,7 +32,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::patch('sites/{site}/enable', [Server\Nginx\SiteController::class, 'enable']);
         Route::patch('sites/{site}/disable', [Server\Nginx\SiteController::class, 'disable']);
 
-        Route::apiResource('logs', Server\Nginx\LogController::class);
+        Route::apiResource('logs', Server\Nginx\LogController::class)
+             ->only(['index', 'show', 'destroy']);
+    });
+
+    Route::prefix('servers/{server}/certbot')->group(function () {
+        Route::apiResource('certs', CertController::class);
     });
 
     Route::apiResource('projects', ProjectController::class);

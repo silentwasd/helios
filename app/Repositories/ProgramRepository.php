@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Contracts\Program;
+use App\Programs\Certbot;
 use App\Programs\MySql;
 use App\Programs\Nginx;
 use App\Programs\Php;
@@ -19,7 +20,8 @@ class ProgramRepository
         PhpFpm::class,
         MySql::class,
         Redis::class,
-        Supervisor::class
+        Supervisor::class,
+        Certbot::class
     ];
 
     public function all(): Collection
