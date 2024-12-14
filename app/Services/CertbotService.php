@@ -49,4 +49,16 @@ class CertbotService
 
         return true;
     }
+
+    public function renewCert(string $name): bool|string
+    {
+        $process = $this->server->executeSsh([
+            "certbot renew --cert-name $name"
+        ]);
+
+        if (!$process->isSuccessful())
+            return $process->getErrorOutput();
+
+        return true;
+    }
 }
