@@ -37,7 +37,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::prefix('servers/{server}/certbot')->group(function () {
-        Route::apiResource('certs', CertController::class);
+        Route::apiResource('certs', CertController::class)
+             ->only(['index', 'store', 'update']);
     });
 
     Route::apiResource('projects', ProjectController::class);
