@@ -42,10 +42,13 @@ class CertController extends Controller
         if (($result = $certbot->requestCertStandalone($data['name'])) && $result !== true)
             abort(500, $result);
     }
-    
-    public function update(Request $request, Server $server, string $name)
+
+    public function update(Server $server, string $name)
     {
         $certbot = new CertbotService($server);
+
+        if (!$certbot->hasLiveCert($name))
+            abort(404, "Cert not found.");
 
         if (($result = $certbot->renewCert($name)) && $result !== true)
             abort(500, $result);
