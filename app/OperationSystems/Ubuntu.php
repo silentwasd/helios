@@ -39,8 +39,10 @@ class Ubuntu implements OperationSystem
     function checkProgram(Program $program): bool
     {
         return $this->server->executeSsh([
-            "dpkg -l | grep {$program->name()}"
-        ])->isSuccessful();
+                "dpkg -l | grep {$program->name()}"
+            ])->isSuccessful() || $this->server->executeSsh([
+                "command -v {$program->name()}"
+            ])->isSuccessful();
     }
 
     function startService(string $name): bool
