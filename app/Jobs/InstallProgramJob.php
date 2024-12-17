@@ -36,5 +36,7 @@ class InstallProgramJob implements ShouldQueue
         } else {
             $this->program->update(['status' => ProgramStatus::NotInstalled]);
         }
+
+        Artisan::call('update:program-status');
     }
 }
