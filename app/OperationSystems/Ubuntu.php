@@ -15,25 +15,36 @@ class Ubuntu implements OperationSystem
     {
     }
 
-    function installProgram(Program $program): bool
+    public function installPackage(string|array $name): bool
     {
+        $name = is_string($name) ? [$name] : $name;
+
         return $this->server->executeSsh([
             "apt update",
-            "apt install -y {$program->name()}"
+            ...array_map(fn(string $_name) => "apt install -y $_name", $name)
         ])->isSuccessful();
+    }
+
+    public function uninstallPackage(string|array $name): bool
+    {
+        $name = is_string($name) ? [$name] : $name;
+
+        $process = $this->server->executeSsh([
+            ...array_map(fn(string $_name) => "apt purge $_name -y", $name),
+            "apt autoremove --purge -y"
+        ]);
+
+        return $process->isSuccessful();
+    }
+
+    function installProgram(Program $program): bool
+    {
+        return $this->installPackage($program->name());
     }
 
     function uninstallProgram(Program $program): bool
     {
-        $process = $this->server->executeSsh([
-            "apt purge {$program->name()} -y",
-            "apt purge {$program->name()}* -y",
-            "apt autoremove --purge -y"
-        ]);
-
-        //Log::info($process->getOutput());
-
-        return $process->isSuccessful();
+        return $this->uninstallPackage([$program->name(), $program->name() . '*']);
     }
 
     function checkProgram(Program $program): bool

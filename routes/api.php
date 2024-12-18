@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Controllers\Ai;
+use App\Http\Controllers\Server;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Project;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\Server;
-use App\Http\Controllers\Server\Certbot\CertController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\SshKeyController;
 use App\Http\Middleware\ServiceMiddleware;
@@ -22,7 +21,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('servers', ServerController::class);
 
-    Route::apiResource('servers.programs', Server\ProgramController::class);
+    Route::apiResource('servers.programs', Server\ProgramController::class)
+         ->except(['show']);
 
     Route::apiSingleton('servers.nginx', Server\Nginx\ConfigController::class)
          ->only(['show', 'update']);
@@ -36,8 +36,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
              ->only(['index', 'show', 'destroy']);
     });
 
+    Route::apiSingleton('servers.php', Server\Php\ConfigController::class)
+         ->only(['show', 'update']);
+
+    Route::prefix('servers/{server}/php')->group(function () {
+        Route::apiResource('extensions', Server\Php\ExtensionController::class)
+             ->only(['index', 'store', 'destroy']);
+    });
+
     Route::prefix('servers/{server}/certbot')->group(function () {
-        Route::apiResource('certs', CertController::class)
+        Route::apiResource('certs', Server\Certbot\CertController::class)
              ->only(['index', 'store', 'update']);
     });
 

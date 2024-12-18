@@ -4,6 +4,10 @@ namespace App\Contracts;
 
 interface OperationSystem
 {
+    function installPackage(string $name): bool;
+
+    function uninstallPackage(string $name): bool;
+
     function installProgram(Program $program): bool;
 
     function uninstallProgram(Program $program): bool;
