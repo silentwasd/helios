@@ -50,7 +50,7 @@ class Ubuntu implements OperationSystem
     function checkProgram(Program $program): bool
     {
         return $this->server->executeSsh([
-                "dpkg -l | grep {$program->name()}"
+                "dpkg -l | grep -w \"^ii  {$program->name()}\""
             ])->isSuccessful() || $this->server->executeSsh([
                 "command -v {$program->name()}"
             ])->isSuccessful();
